@@ -123,6 +123,7 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
 .formbtns{display:flex;gap:10px}
 .formbtns button{flex:1}
 
+.foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:6px;font-size:12px;color:var(--dim);text-align:center}.foot .made{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.foot .made b{color:var(--sakura)}
 @media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stat:nth-child(4){border-left:0;padding-left:0}.filters,.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}}
 @media(max-width:560px){.card{grid-template-columns:96px minmax(0,1fr);gap:14px}.cover{width:96px}.title{font-size:17px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -155,6 +156,11 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
   </div>
 
   <main id="list" class="list"></main>
+  <footer class="foot">
+    <div class="made">Made by <b>PanRodla</b></div>
+    <div>© <span id="year"></span> PanRodla. Wszelkie prawa zastrzeżone. Kopiowanie i rozpowszechnianie programu bez zgody autora zabronione.</div>
+    <div>Okładki, opisy i tytuły anime pochodzą z MyAnimeList (Jikan) i AniList i należą do ich prawowitych właścicieli. Program nie jest powiązany z tymi serwisami ani z Shinden.</div>
+  </footer>
 </div>
 
 <div id="modal" class="modal hidden"><div class="sheet">
@@ -242,5 +248,6 @@ $('lookup').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 ['search','filterStatus','filterGenre','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',draw));
+$('year').textContent=new Date().getFullYear();
 migrate();
 </script></body></html>
