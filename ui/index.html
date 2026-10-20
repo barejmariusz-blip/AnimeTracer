@@ -1,39 +1,246 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anime Tracker</title><style>
-:root{--bg:#0b1020;--panel:#151b31;--panel2:#1d2542;--txt:#f7f7fb;--muted:#aeb7d0;--acc:#a855f7;--pink:#ec4899;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--yellow:#f59e0b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#30205d 0,#12152a 35%,#090d18 100%);color:var(--txt);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}.wrap{max-width:1280px;margin:auto;padding:24px}.top{text-align:center;margin:10px 0 22px}.top h1{font-size:44px;margin:0}.top p{color:#d8c8ef}.toolbar,.stats,.filters{display:grid;gap:12px}.stats{grid-template-columns:repeat(5,1fr);margin-bottom:16px}.stat,.box,.card{background:rgba(21,27,49,.9);border:1px solid #ffffff18;border-radius:16px;box-shadow:0 12px 35px #0004}.stat{padding:16px}.stat b{font-size:28px;display:block}.stat span{color:var(--muted);font-size:13px}.toolbar{grid-template-columns:2fr 1fr 1fr 1fr;margin-bottom:12px}.filters{grid-template-columns:2fr 1fr 1fr 1fr;margin-bottom:18px}button,input,select,textarea{font:inherit}button{border:0;border-radius:10px;padding:11px 14px;cursor:pointer;color:white;background:#313957;font-weight:700}button:hover{filter:brightness(1.12)}.primary{background:linear-gradient(90deg,var(--pink),var(--acc))}.good{background:#15803d}.danger{background:#991b1b}.input{width:100%;background:#0e1428;border:1px solid #ffffff24;color:white;border-radius:10px;padding:11px}.box{padding:18px;margin-bottom:18px}.hidden{display:none!important}.formgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}.formgrid .wide{grid-column:1/-1}.preview{display:flex;gap:15px;align-items:center;background:#ffffff0b;padding:12px;border-radius:12px;margin:12px 0}.preview img{width:72px;height:100px;object-fit:cover;border-radius:8px}.results{display:grid;gap:8px;margin-top:10px}.result{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;background:#ffffff0b;padding:8px;border-radius:10px}.result img{width:52px;height:72px;object-fit:cover;border-radius:6px}.result button{padding:8px 10px}.list{display:grid;gap:14px}.card{padding:16px;display:grid;grid-template-columns:100px 1fr;gap:16px}.cover{width:100px;height:142px;object-fit:cover;border-radius:10px;background:#252c46}.head{display:flex;justify-content:space-between;gap:10px}.title{font-size:23px;font-weight:800}.sub{color:var(--muted);font-size:13px;margin-top:4px}.badges{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0}.badge{font-size:12px;padding:5px 9px;border-radius:999px;background:#39415f}.watching{background:#1d4ed8}.completed{background:#15803d}.plan{background:#7e22ce}.waiting{background:#b45309}.dropped{background:#991b1b}.progressrow{display:flex;align-items:center;gap:10px}.bar{height:10px;background:#ffffff1a;border-radius:99px;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--acc))}.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}.actions button{padding:8px 11px}.rating{color:#fbbf24;font-weight:800}.note{color:#d5daea;font-size:13px;margin-top:8px;white-space:pre-wrap}.desc{color:#cbd3e7;font-size:13px;line-height:1.5;margin-top:9px}.desc.collapsed{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.more{background:transparent;padding:4px 0;color:#c084fc;font-size:12px}.empty{text-align:center;color:var(--muted);padding:50px}.modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}.modal .box{width:min(720px,100%);max-height:90vh;overflow:auto;margin:0}.small{font-size:12px;color:var(--muted)}.savebar{display:inline-block;margin-top:4px;font-size:13px;color:var(--muted);background:#ffffff0d;border:1px solid #ffffff18;border-radius:999px;padding:6px 14px}.savebar.ok{color:#86efac}.savebar.err{color:#fca5a5;border-color:#ef444466}@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.toolbar,.filters,.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}.card{grid-template-columns:70px 1fr}.cover{width:70px;height:100px}.top h1{font-size:34px}}
-</style></head><body><div class="wrap"><div class="top"><h1>🎌 Anime Tracker 2.0</h1><p>Biblioteka, sezony, odcinki i oceny — zapis automatyczny na dysku</p><div id="savebar" class="savebar">⏳ Wczytuję bibliotekę…</div></div><div id="stats" class="stats"></div>
-<div class="toolbar"><button class="primary" id="addOpen">➕ Dodaj anime</button><button id="exportBtn">💾 Zrób kopię teraz</button><button id="importBtn">📂 Przywróć z pliku</button><button id="autoBackupBtn">📁 Folder z danymi</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
-<div class="filters"><input id="search" class="input" placeholder="🔎 Szukaj tytułu, gatunku, notatki..."><select id="filterStatus" class="input"><option value="all">Wszystkie statusy</option><option value="watching">Oglądam</option><option value="plan">Planuję</option><option value="waiting">Czekam na sezon</option><option value="completed">Ukończone</option><option value="dropped">Porzucone</option></select><select id="sort" class="input"><option value="recent">Ostatnio zmieniane</option><option value="title">Tytuł A–Z</option><option value="rating">Najwyższa ocena</option><option value="progress">Największy postęp</option><option value="added">Ostatnio dodane</option></select><select id="filterGenre" class="input"><option value="all">Wszystkie gatunki</option></select></div><div id="list" class="list"></div></div>
-<div id="modal" class="modal hidden"><div class="box"><div class="head"><h2 id="formTitle">Dodaj anime</h2><button id="close">✕</button></div><div class="formgrid"><div class="wide"><label>Link Shinden / nazwa anime</label><div style="display:flex;gap:8px"><input id="lookup" class="input" placeholder="Wklej link Shinden albo wpisz np. Solo Leveling"><button class="primary" id="lookupBtn">🔎 Pobierz dane</button></div><div class="small">Dane anime są wyszukiwane w publicznej bazie Jikan/MyAnimeList. Link Shinden zostaje zapisany jako „Oglądaj”.</div></div><div id="preview" class="preview wide hidden"></div><div><label>Tytuł</label><input id="title" class="input"></div><div><label>Sezon / część</label><input id="season" class="input" placeholder="np. S2"></div><div><label>Seria / uniwersum</label><input id="series" class="input"></div><div><label>Liczba odcinków</label><input id="episodes" type="number" min="0" class="input"></div><div><label>Obejrzany odcinek</label><input id="current" type="number" min="0" class="input" value="0"></div><div><label>Ocena 1–10</label><input id="rating" type="number" min="0" max="10" step="0.5" class="input" value="0"></div><div><label>Status</label><select id="status" class="input"><option value="watching">Oglądam</option><option value="plan">Planuję</option><option value="waiting">Czekam na sezon</option><option value="completed">Ukończone</option><option value="dropped">Porzucone</option></select></div><div><label>Rok</label><input id="year" type="number" class="input"></div><div><label>Gatunki (po przecinku)</label><input id="genres" class="input"></div><div class="wide"><label>Link do oglądania</label><input id="url" class="input"></div><div class="wide"><label>URL okładki</label><input id="image" class="input"></div><div class="wide"><label>Krótki opis</label><textarea id="description" class="input" rows="4" placeholder="O czym jest to anime..."></textarea></div><div class="wide"><label>Notatka</label><textarea id="notes" class="input" rows="3" placeholder="np. czekam na kolejny sezon..."></textarea></div><div class="wide" style="display:flex;gap:10px"><button class="primary" id="save" style="flex:1">💾 Zapisz</button><button id="cancel" style="flex:1">Anuluj</button></div></div></div></div>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anime Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: nocny plakat anime — rastrowe tło jak w mandze, półka z okładkami, odcinki jako klatki taśmy */
+:root{
+  --ink:#0d0e16; --ink2:#151726; --ink3:#1e2135; --line:#2a2e48;
+  --paper:#f1ece2; --muted:#9a9cb5; --dim:#6b6e8a;
+  --sakura:#ff5c7a; --sakura2:#ff8fa3; --yuzu:#f7c948; --mint:#4fd1a5; --sky:#5ab4ff; --plum:#b48cff; --rust:#e0664a;
+  --display:"Unbounded","Segoe UI Black",system-ui,sans-serif;
+  --body:"Manrope","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",Consolas,monospace;
+  --jp:"Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--ink);color:var(--paper);font:15px/1.5 var(--body);
+  background-image:radial-gradient(circle at 1px 1px,#ffffff0d 1px,transparent 1.4px),radial-gradient(1200px 600px at 85% -10%,#ff5c7a1f,transparent 60%),radial-gradient(900px 500px at -10% 110%,#5ab4ff14,transparent 60%);
+  background-size:14px 14px,auto,auto;background-attachment:fixed}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sakura);outline-offset:2px}
+.hidden{display:none!important}
+.wrap{max-width:1360px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px));display:grid;gap:22px}
+
+/* header */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative}
+.brand h1{font-family:var(--display);font-weight:900;font-size:clamp(30px,4vw,48px);line-height:.95;margin:0;letter-spacing:-.02em;text-transform:uppercase}
+.brand h1 span{color:var(--sakura)}
+.brand .jp{font-family:var(--jp);font-size:13px;letter-spacing:.5em;color:var(--muted);margin-top:8px}
+.watermark{position:fixed;right:-20px;bottom:-40px;font-family:var(--jp);font-weight:900;font-size:220px;line-height:1;color:#ffffff06;writing-mode:vertical-rl;pointer-events:none;z-index:0;user-select:none}
+.wrap>*{position:relative;z-index:1}
+.savebar{font:500 12px var(--mono);color:var(--muted);display:flex;align-items:center;gap:8px;margin-top:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.savebar::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.savebar.ok{color:#9fe3c8}.savebar.ok::before{background:var(--mint);box-shadow:0 0 10px var(--mint)}
+.savebar.err{color:#ffb3b3}.savebar.err::before{background:var(--rust)}
+
+/* buttons */
+button{border:1px solid var(--line);background:var(--ink3);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;font-size:14px;transition:transform .12s,background .15s,border-color .15s}
+button:hover{border-color:#454a70;background:#262a42}
+button:active{transform:translateY(1px)}
+.primary{background:var(--sakura);border-color:var(--sakura);color:#1a0710}
+.primary:hover{background:var(--sakura2);border-color:var(--sakura2)}
+.ghost{background:transparent}
+.danger:hover{border-color:var(--rust);color:#ffb3a3;background:#e0664a1a}
+.big{font-family:var(--display);font-weight:700;font-size:15px;padding:14px 22px;border-radius:12px;letter-spacing:.02em}
+.toolbtns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat{padding:14px 18px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{font:700 30px/1 var(--mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat.s-watching b{color:var(--sky)}.stat.s-completed b{color:var(--mint)}.stat.s-plan b{color:var(--plum)}.stat.s-waiting b{color:var(--yuzu)}.stat.s-eps b{color:var(--sakura)}
+
+/* filters */
+.filters{display:grid;grid-template-columns:minmax(0,2.2fr) repeat(3,minmax(0,1fr));gap:10px}
+.input{width:100%;background:var(--ink2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--paper)}
+.input:focus{border-color:var(--sakura);outline:none}
+select.input{cursor:pointer}
+label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+
+/* chips for status quick filter */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;color:var(--muted)}
+.chip.on{color:var(--ink);background:var(--paper);border-color:var(--paper)}
+
+/* list */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,560px),1fr));gap:18px}
+.card{position:relative;display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;padding:16px;border-radius:18px;background:var(--ink2);border:1px solid var(--line);overflow:hidden;isolation:isolate}
+.card .bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(40px) saturate(1.4);opacity:.22;z-index:-1}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#151726 0%,#151726cc 45%,#151726ee 100%);z-index:-1}
+.coverbox{position:relative;align-self:start}
+.cover{width:150px;aspect-ratio:2/3;object-fit:cover;border-radius:10px;display:block;background:var(--ink3);box-shadow:0 14px 30px #0008}
+.rating{position:absolute;left:8px;bottom:8px;font:700 13px var(--mono);background:#0d0e16e6;color:var(--yuzu);padding:4px 8px;border-radius:6px}
+.body{min-width:0;display:flex;flex-direction:column;gap:10px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.title{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15;text-wrap:balance;letter-spacing:-.01em}
+.title .season{font-family:var(--mono);font-size:12px;color:var(--sakura2);border:1px solid #ff5c7a66;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:3px}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.stamp{flex:none;font:800 11px var(--body);letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border:1.5px solid currentColor;border-radius:6px;transform:rotate(-3deg)}
+.stamp.watching{color:var(--sky)}.stamp.completed{color:var(--mint)}.stamp.plan{color:var(--plum)}.stamp.waiting{color:var(--yuzu)}.stamp.dropped{color:var(--rust)}
+.genres{display:flex;flex-wrap:wrap;gap:6px}
+.genre{font-size:12px;color:#cfd0e2;background:#ffffff0d;border-radius:999px;padding:3px 10px}
+
+/* episode film strip */
+.eprow{display:flex;align-items:center;gap:14px}
+.epcount{font:700 13px var(--mono);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.epcount b{font-size:24px;color:var(--paper)}
+.strip{flex:1;display:flex;gap:3px;min-width:0}
+.seg{flex:1;height:14px;border-radius:3px;background:#ffffff12;border:0;padding:0;min-width:0;cursor:pointer}
+.seg:hover{background:#ffffff30}
+.seg.done{background:var(--sakura)}
+.seg.next{background:transparent;box-shadow:inset 0 0 0 1.5px var(--sakura2);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:inset 0 0 0 1.5px #ff8fa355}}
+.bar{flex:1;height:10px;background:#ffffff12;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sakura)}
+.desc{color:#c9cadb;font-size:13.5px;line-height:1.55}
+.desc.collapsed{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.more{background:none;border:0;padding:0;color:var(--sakura2);font-size:12px;align-self:flex-start}
+.more:hover{background:none;text-decoration:underline}
+.note{font-size:13px;color:var(--yuzu);border-left:2px solid var(--yuzu);padding-left:10px;white-space:pre-wrap}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
+.actions button{padding:9px 13px}
+.actions .primary{font-family:var(--display);font-size:13px;letter-spacing:.03em}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:70px 20px;border:1px dashed var(--line);border-radius:18px}
+.empty b{display:block;font-family:var(--display);font-size:20px;color:var(--paper);margin-bottom:6px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:#05060bcc;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
+.sheet{width:min(780px,100%);max-height:92vh;overflow:auto;background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:24px}
+.sheet .head h2{font-family:var(--display);font-size:22px;margin:0}
+.formgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-top:18px}
+.formgrid .wide{grid-column:1/-1}
+.lookuprow{display:flex;gap:8px}
+.small{font-size:12px;color:var(--muted);margin-top:6px}
+.preview{display:flex;gap:14px;align-items:center;background:var(--ink3);padding:12px;border-radius:12px}
+.preview img{width:72px;height:104px;object-fit:cover;border-radius:8px}
+.results{display:grid;gap:8px;margin-top:10px}
+.result{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--ink2);padding:8px;border-radius:10px}
+.result img{width:48px;height:68px;object-fit:cover;border-radius:6px}
+.formbtns{display:flex;gap:10px}
+.formbtns button{flex:1}
+
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stat:nth-child(4){border-left:0;padding-left:0}.filters,.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}}
+@media(max-width:560px){.card{grid-template-columns:96px minmax(0,1fr);gap:14px}.cover{width:96px}.title{font-size:17px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="watermark" aria-hidden="true">アニメ</div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Anime<span>/</span>Tracker</h1>
+      <div class="jp">アニメ・トラッカー</div>
+      <div id="savebar" class="savebar">Wczytuję bibliotekę…</div>
+    </div>
+    <div class="toolbtns">
+      <button class="ghost" id="exportBtn" title="Zapisz kopię biblioteki do folderu kopie">Zrób kopię</button>
+      <button class="ghost" id="importBtn" title="Wczytaj bibliotekę z pliku JSON">Przywróć z pliku</button>
+      <button class="ghost" id="autoBackupBtn" title="Otwórz folder z danymi">Folder z danymi</button>
+      <button class="primary big" id="addOpen">+ Dodaj anime</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </header>
+
+  <section id="stats" class="stats"></section>
+
+  <div class="chips" id="chips"></div>
+  <div class="filters">
+    <input id="search" class="input" placeholder="Szukaj tytułu, gatunku, notatki…">
+    <select id="filterStatus" class="input"><option value="all">Wszystkie statusy</option><option value="watching">Oglądam</option><option value="plan">Planuję</option><option value="waiting">Czekam na sezon</option><option value="completed">Ukończone</option><option value="dropped">Porzucone</option></select>
+    <select id="sort" class="input"><option value="recent">Ostatnio zmieniane</option><option value="title">Tytuł A–Z</option><option value="rating">Najwyższa ocena</option><option value="progress">Największy postęp</option><option value="added">Ostatnio dodane</option></select>
+    <select id="filterGenre" class="input"><option value="all">Wszystkie gatunki</option></select>
+  </div>
+
+  <main id="list" class="list"></main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="sheet">
+  <div class="head"><h2 id="formTitle">Dodaj anime</h2><button class="ghost" id="close" aria-label="Zamknij">✕</button></div>
+  <div class="formgrid">
+    <div class="wide"><label for="lookup">Link Shinden / nazwa anime</label><div class="lookuprow"><input id="lookup" class="input" placeholder="Wklej link Shinden albo wpisz np. Solo Leveling"><button class="primary" id="lookupBtn">Pobierz dane</button></div><div class="small">Dane pobierane z Jikan (MyAnimeList) albo AniList. Link Shinden zostaje zapisany pod przyciskiem „Oglądaj”.</div></div>
+    <div id="preview" class="preview wide hidden"></div>
+    <div><label for="title">Tytuł</label><input id="title" class="input"></div>
+    <div><label for="season">Sezon / część</label><input id="season" class="input" placeholder="np. S2"></div>
+    <div><label for="series">Seria / uniwersum</label><input id="series" class="input"></div>
+    <div><label for="episodes">Liczba odcinków</label><input id="episodes" type="number" min="0" class="input"></div>
+    <div><label for="current">Obejrzany odcinek</label><input id="current" type="number" min="0" class="input" value="0"></div>
+    <div><label for="rating">Ocena 1–10</label><input id="rating" type="number" min="0" max="10" step="0.5" class="input" value="0"></div>
+    <div><label for="status">Status</label><select id="status" class="input"><option value="watching">Oglądam</option><option value="plan">Planuję</option><option value="waiting">Czekam na sezon</option><option value="completed">Ukończone</option><option value="dropped">Porzucone</option></select></div>
+    <div><label for="year">Rok</label><input id="year" type="number" class="input"></div>
+    <div><label for="genres">Gatunki (po przecinku)</label><input id="genres" class="input"></div>
+    <div class="wide"><label for="url">Link do oglądania</label><input id="url" class="input"></div>
+    <div class="wide"><label for="image">URL okładki</label><input id="image" class="input"></div>
+    <div class="wide"><label for="description">Krótki opis</label><textarea id="description" class="input" rows="4" placeholder="O czym jest to anime…"></textarea></div>
+    <div class="wide"><label for="notes">Notatka</label><textarea id="notes" class="input" rows="3" placeholder="np. czekam na kolejny sezon…"></textarea></div>
+    <div class="wide formbtns"><button class="primary big" id="save">Zapisz</button><button id="cancel">Anuluj</button></div>
+  </div>
+</div></div>
+
 <script>
-const KEY='animes'; let data=[]; let editing=null; let lookupData=null;
+let data=[]; let editing=null; let lookupData=null;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function bar(t,c=''){let b=$('savebar');b.textContent=t;b.className='savebar '+c}
+function bar(t,c=''){let b=$('savebar');b.textContent=t;b.title=t;b.className='savebar '+c}
 let saveQ=Promise.resolve(),dataFile='';
-function norm(old){return data=old.map(a=>({id:a.id||Date.now()+Math.random(),title:a.title||'',series:a.series||'',season:a.season||'',totalEpisodes:Number(a.totalEpisodes??a.episodes??0),currentEpisode:Number(a.currentEpisode||0),url:a.url||'',image:a.image||'',rating:Number(a.rating||0),status:a.status||'watching',genres:Array.isArray(a.genres)?a.genres:[],year:a.year||'',description:a.description||a.synopsis||'',notes:a.notes||'',addedDate:a.addedDate||new Date().toISOString(),updatedDate:a.updatedDate||a.addedDate||new Date().toISOString()}))}
-async function migrate(){try{let r=await fetch('/api/data');let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));dataFile=js.file;data=norm(js.animes||[]);draw();bar('✅ '+data.length+' anime • zapis: '+dataFile,'ok')}catch(e){bar('❌ Nie udało się wczytać danych: '+e.message,'err');alert('Nie udało się wczytać biblioteki.\n\n'+e.message)}}
-function save(render=true){if(render)draw();let snap=JSON.stringify(data);bar('💾 Zapisuję…');saveQ=saveQ.then(async()=>{try{let r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:snap});let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));bar('✅ Zapisano '+js.savedAt+' • '+js.count+' anime • '+dataFile,'ok')}catch(e){bar('❌ BŁĄD ZAPISU: '+e.message,'err');alert('Nie udało się zapisać!\n\n'+e.message)}})}
-function label(s){return {watching:'Oglądam',completed:'Ukończone',plan:'Planuję',waiting:'Czekam na sezon',dropped:'Porzucone'}[s]||s}
-function draw(){let st={watching:0,completed:0,plan:0,waiting:0,eps:0};data.forEach(a=>{if(st[a.status]!=null)st[a.status]++;st.eps+=a.currentEpisode});$('stats').innerHTML=[['🕐 Oglądam',st.watching],['✅ Ukończone',st.completed],['⭐ Planuję',st.plan],['⏳ Czekam',st.waiting],['🎬 Odcinki',st.eps]].map(x=>`<div class="stat"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-let gs=[...new Set(data.flatMap(a=>a.genres||[]))].sort();let gv=$('filterGenre').value;$('filterGenre').innerHTML='<option value="all">Wszystkie gatunki</option>'+gs.map(g=>`<option ${g===gv?'selected':''}>${esc(g)}</option>`).join('');let q=$('search').value.toLowerCase(),fs=$('filterStatus').value,fg=$('filterGenre').value;let arr=data.filter(a=>(fs==='all'||a.status===fs)&&(fg==='all'||a.genres.includes(fg))&&([a.title,a.series,a.season,a.description,a.notes,...a.genres].join(' ').toLowerCase().includes(q)));let so=$('sort').value;arr.sort((a,b)=>so==='title'?a.title.localeCompare(b.title):so==='rating'?b.rating-a.rating:so==='progress'?((b.currentEpisode/(b.totalEpisodes||1))-(a.currentEpisode/(a.totalEpisodes||1))):so==='added'?new Date(b.addedDate)-new Date(a.addedDate):new Date(b.updatedDate)-new Date(a.updatedDate));$('list').innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">Brak anime pasujących do filtrów.</div>'}
-function card(a){let p=a.totalEpisodes?Math.min(100,a.currentEpisode/a.totalEpisodes*100):0;return `<div class="card"><img class="cover" src="${esc(a.image||'')}" onerror="this.style.visibility='hidden'"><div><div class="head"><div><div class="title">${esc(a.title)} ${a.season?`<span class="sub">${esc(a.season)}</span>`:''}</div><div class="sub">${esc(a.series||'')}${a.year?' • '+esc(a.year):''}</div></div><div class="rating">${a.rating?`★ ${a.rating}/10`:''}</div></div><div class="badges"><span class="badge ${a.status}">${label(a.status)}</span>${(a.genres||[]).map(g=>`<span class="badge">${esc(g)}</span>`).join('')}</div><div class="progressrow"><b>${a.currentEpisode} / ${a.totalEpisodes||'?'}</b><div class="bar"><i style="width:${p}%"></i></div><b>${Math.round(p)}%</b></div>${a.description?`<div id="desc-${a.id}" class="desc collapsed">${esc(a.description)}</div><button class="more" onclick="toggleDesc(${a.id},this)">Więcej</button>`:''}${a.notes?`<div class="note">${esc(a.notes)}</div>`:''}<div class="actions"><button onclick="ep(${a.id},-1)">− Odcinek</button><button class="primary" onclick="ep(${a.id},1)">+ Następny</button>${a.url?`<button onclick="openUrl(${a.id})">▶ Oglądaj</button>`:''}<button onclick="edit(${a.id})">✏️ Edytuj</button><button class="danger" onclick="del(${a.id})">🗑️</button></div></div></div>`}
-function ep(id,d){let a=data.find(x=>x.id===id);a.currentEpisode=Math.max(0,a.totalEpisodes?Math.min(a.totalEpisodes,a.currentEpisode+d):a.currentEpisode+d);if(a.totalEpisodes&&a.currentEpisode===a.totalEpisodes)a.status='completed';else if(d>0&&a.status==='plan')a.status='watching';a.updatedDate=new Date().toISOString();save()}
+function norm(old){return old.map(a=>({id:a.id||Date.now()+Math.random(),title:a.title||'',series:a.series||'',season:a.season||'',totalEpisodes:Number(a.totalEpisodes??a.episodes??0),currentEpisode:Number(a.currentEpisode||0),url:a.url||'',image:a.image||'',rating:Number(a.rating||0),status:a.status||'watching',genres:Array.isArray(a.genres)?a.genres:[],year:a.year||'',description:a.description||a.synopsis||'',notes:a.notes||'',addedDate:a.addedDate||new Date().toISOString(),updatedDate:a.updatedDate||a.addedDate||new Date().toISOString()}))}
+async function migrate(){try{let r=await fetch('/api/data');let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));dataFile=js.file;data=norm(js.animes||[]);draw();bar(data.length+' anime • zapis: '+dataFile,'ok')}catch(e){bar('Nie udało się wczytać danych: '+e.message,'err');alert('Nie udało się wczytać biblioteki.\n\n'+e.message)}}
+function save(render=true){if(render)draw();let snap=JSON.stringify(data);bar('Zapisuję…');saveQ=saveQ.then(async()=>{try{let r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:snap});let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));bar('Zapisano '+js.savedAt+' • '+js.count+' anime • '+dataFile,'ok')}catch(e){bar('BŁĄD ZAPISU: '+e.message,'err');alert('Nie udało się zapisać!\n\n'+e.message)}})}
+const LABELS={watching:'Oglądam',completed:'Ukończone',plan:'Planuję',waiting:'Czekam',dropped:'Porzucone'};
+function label(s){return LABELS[s]||s}
+function draw(){
+ let st={watching:0,completed:0,plan:0,waiting:0,eps:0};data.forEach(a=>{if(st[a.status]!=null)st[a.status]++;st.eps+=a.currentEpisode});
+ $('stats').innerHTML=[['watching','Oglądam',st.watching],['completed','Ukończone',st.completed],['plan','Planuję',st.plan],['waiting','Czekam na sezon',st.waiting],['eps','Obejrzane odcinki',st.eps]].map(x=>`<div class="stat s-${x[0]}"><b>${x[2]}</b><span>${x[1]}</span></div>`).join('');
+ let fs=$('filterStatus').value;
+ $('chips').innerHTML=[['all','Wszystkie',data.length],...Object.keys(LABELS).map(k=>[k,label(k),data.filter(a=>a.status===k).length])].filter(c=>c[0]==='all'||c[2]).map(c=>`<button class="chip ${fs===c[0]?'on':''}" onclick="setStatus('${c[0]}')">${c[1]} · ${c[2]}</button>`).join('');
+ let gs=[...new Set(data.flatMap(a=>a.genres||[]))].sort();let gv=$('filterGenre').value;$('filterGenre').innerHTML='<option value="all">Wszystkie gatunki</option>'+gs.map(g=>`<option ${g===gv?'selected':''}>${esc(g)}</option>`).join('');
+ let q=$('search').value.toLowerCase(),fg=$('filterGenre').value;
+ let arr=data.filter(a=>(fs==='all'||a.status===fs)&&(fg==='all'||a.genres.includes(fg))&&([a.title,a.series,a.season,a.description,a.notes,...a.genres].join(' ').toLowerCase().includes(q)));
+ let so=$('sort').value;arr.sort((a,b)=>so==='title'?a.title.localeCompare(b.title):so==='rating'?b.rating-a.rating:so==='progress'?((b.currentEpisode/(b.totalEpisodes||1))-(a.currentEpisode/(a.totalEpisodes||1))):so==='added'?new Date(b.addedDate)-new Date(a.addedDate):new Date(b.updatedDate)-new Date(a.updatedDate));
+ $('list').innerHTML=arr.length?arr.map(card).join(''):(data.length?'<div class="empty"><b>Nic tu nie ma</b>Żadne anime nie pasuje do filtrów.</div>':'<div class="empty"><b>Pusta półka</b>Kliknij „+ Dodaj anime”, wklej link z Shinden i gotowe.</div>')
+}
+function setStatus(s){$('filterStatus').value=s;draw()}
+function strip(a){
+ let t=a.totalEpisodes,c=a.currentEpisode;
+ if(t&&t<=60){let h='';for(let i=1;i<=t;i++)h+=`<button class="seg ${i<=c?'done':i===c+1?'next':''}" title="Odcinek ${i}" onclick="setEp(${a.id},${i})"></button>`;return `<div class="strip">${h}</div>`}
+ let p=t?Math.min(100,c/t*100):0;return `<div class="bar"><i style="width:${p}%"></i></div>`
+}
+function card(a){
+ return `<article class="card">${a.image?`<div class="bg" style="background-image:url('${esc(a.image)}')"></div>`:''}
+ <div class="coverbox"><img class="cover" src="${esc(a.image||'')}" alt="" onerror="this.style.visibility='hidden'">${a.rating?`<div class="rating">★ ${a.rating}</div>`:''}</div>
+ <div class="body">
+  <div class="head"><div><div class="title">${esc(a.title)}${a.season?`<span class="season">${esc(a.season)}</span>`:''}</div><div class="sub">${[a.series,a.year].filter(Boolean).map(esc).join(' • ')}</div></div><span class="stamp ${a.status}">${label(a.status)}</span></div>
+  ${(a.genres||[]).length?`<div class="genres">${a.genres.map(g=>`<span class="genre">${esc(g)}</span>`).join('')}</div>`:''}
+  <div class="eprow"><div class="epcount">EP <b>${String(a.currentEpisode).padStart(2,'0')}</b> / ${a.totalEpisodes||'?'}</div>${strip(a)}</div>
+  ${a.description?`<div id="desc-${a.id}" class="desc collapsed">${esc(a.description)}</div><button class="more" onclick="toggleDesc(${a.id},this)">Więcej</button>`:''}
+  ${a.notes?`<div class="note">${esc(a.notes)}</div>`:''}
+  <div class="actions"><button class="primary" onclick="ep(${a.id},1)">+ Następny odcinek</button>${a.url?`<button onclick="openUrl(${a.id})">▶ Oglądaj</button>`:''}<button onclick="ep(${a.id},-1)" title="Cofnij odcinek">−1</button><button onclick="edit(${a.id})" title="Edytuj">✎</button><button class="danger" onclick="del(${a.id})" title="Usuń">✕</button></div>
+ </div></article>`
+}
+function touch(a){if(a.totalEpisodes&&a.currentEpisode===a.totalEpisodes)a.status='completed';else if(a.currentEpisode>0&&(a.status==='plan'||a.status==='completed'))a.status='watching';a.updatedDate=new Date().toISOString();save()}
+function ep(id,d){let a=data.find(x=>x.id===id);a.currentEpisode=Math.max(0,a.totalEpisodes?Math.min(a.totalEpisodes,a.currentEpisode+d):a.currentEpisode+d);touch(a)}
+function setEp(id,n){let a=data.find(x=>x.id===id);a.currentEpisode=(a.currentEpisode===n)?n-1:n;touch(a)}
 function openUrl(id){let a=data.find(x=>x.id===id);if(a&&a.url)fetch('/api/open-url?u='+encodeURIComponent(a.url))}
-function del(id){if(confirm('Usunąć to anime?')){data=data.filter(a=>a.id!==id);save()}}
+function del(id){let a=data.find(x=>x.id===id);if(confirm('Usunąć „'+(a?.title||'')+'”?')){data=data.filter(a=>a.id!==id);save()}}
 function toggleDesc(id,b){let e=$('desc-'+id);e.classList.toggle('collapsed');b.textContent=e.classList.contains('collapsed')?'Więcej':'Mniej'}
-function openForm(a=null){editing=a?.id||null;lookupData=null;$('formTitle').textContent=a?'Edytuj anime':'Dodaj anime';['title','series','season','url','image','description','notes'].forEach(k=>$(k).value=a?.[k]||'');$('episodes').value=a?.totalEpisodes||'';$('current').value=a?.currentEpisode||0;$('rating').value=a?.rating||0;$('status').value=a?.status||'watching';$('year').value=a?.year||'';$('genres').value=(a?.genres||[]).join(', ');$('lookup').value=a?.url||'';$('preview').classList.add('hidden');$('modal').classList.remove('hidden')}
+function openForm(a=null){editing=a?.id||null;lookupData=null;$('formTitle').textContent=a?'Edytuj anime':'Dodaj anime';['title','series','season','url','image','description','notes'].forEach(k=>$(k).value=a?.[k]||'');$('episodes').value=a?.totalEpisodes||'';$('current').value=a?.currentEpisode||0;$('rating').value=a?.rating||0;$('status').value=a?.status||'watching';$('year').value=a?.year||'';$('genres').value=(a?.genres||[]).join(', ');$('lookup').value=a?.url||'';$('preview').classList.add('hidden');$('modal').classList.remove('hidden');setTimeout(()=>$('lookup').focus(),0)}
 function edit(id){openForm(data.find(a=>a.id===id))} function close(){ $('modal').classList.add('hidden') }
-function queryFrom(v){
- try{let u=new URL(v);let parts=u.pathname.split('/').filter(Boolean);let slug=parts.length?parts[parts.length-1]:'';if(slug==='episodes'&&parts.length>1)slug=parts[parts.length-2];return decodeURIComponent(slug).replace(/^\d+-/,'').replace(/[-_]+/g,' ').trim()}catch{return v.trim()}}
+function queryFrom(v){try{let u=new URL(v);let parts=u.pathname.split('/').filter(Boolean);let slug=parts.length?parts[parts.length-1]:'';if(slug==='episodes'&&parts.length>1)slug=parts[parts.length-2];return decodeURIComponent(slug).replace(/^\d+-/,'').replace(/[-_]+/g,' ').trim()}catch{return v.trim()}}
 function normalizeResult(a){return {title:a.title_english||a.title||'',native:a.title_japanese||'',episodes:a.episodes||'',year:a.year||a.aired?.from?.slice(0,4)||'',genres:(a.genres||[]).map(x=>x.name),image:a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'',description:a.synopsis||'',source:'Jikan'}}
-function fillResult(a,raw){lookupData=a;$('title').value=a.title||'';$('episodes').value=a.episodes||'';$('year').value=a.year||'';$('genres').value=(a.genres||[]).join(', ');$('image').value=a.image||'';$('description').value=a.description||'';if(/^https?:\/\//i.test(raw))$('url').value=raw;$('preview').innerHTML=`<img src="${esc(a.image)}"><div><b>${esc(a.title)}</b><div class="small">${esc(a.native)} • ${a.episodes||'?'} odc. • ${a.year||''}</div><div class="small">${esc((a.genres||[]).join(', '))}</div><div class="small">Źródło: ${esc(a.source||'baza anime')}</div></div>`;$('preview').classList.remove('hidden')}
+function fillResult(a,raw){lookupData=a;$('title').value=a.title||'';$('episodes').value=a.episodes||'';$('year').value=a.year||'';$('genres').value=(a.genres||[]).join(', ');$('image').value=a.image||'';$('description').value=a.description||'';if(/^https?:\/\//i.test(raw))$('url').value=raw;$('preview').innerHTML=`<img src="${esc(a.image)}" alt=""><div><b>${esc(a.title)}</b><div class="small">${esc(a.native)} • ${a.episodes||'?'} odc. • ${a.year||''}</div><div class="small">${esc((a.genres||[]).join(', '))}</div><div class="small">Źródło: ${esc(a.source||'baza anime')}</div></div>`;$('preview').classList.remove('hidden')}
 async function jikanSearch(q){let ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),9000);try{let r=await fetch('https://api.jikan.moe/v4/anime?q='+encodeURIComponent(q)+'&limit=10&sfw=true',{signal:ctrl.signal,headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);let js=await r.json();return (js.data||[]).map(normalizeResult)}finally{clearTimeout(timer)}}
 async function aniListSearch(q){let query=`query($search:String){Page(page:1,perPage:10){media(search:$search,type:ANIME,sort:SEARCH_MATCH){title{romaji english native}episodes seasonYear genres description(asHtml:false)coverImage{extraLarge large}}}}`;let ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),9000);try{let r=await fetch('https://graphql.anilist.co',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query,variables:{search:q}})});if(!r.ok)throw new Error('HTTP '+r.status);let js=await r.json();return (js.data?.Page?.media||[]).map(a=>({title:a.title.english||a.title.romaji||'',native:a.title.native||'',episodes:a.episodes||'',year:a.seasonYear||'',genres:a.genres||[],image:a.coverImage.extraLarge||a.coverImage.large||'',description:(a.description||'').replace(/<[^>]*>/g,''),source:'AniList'}))}finally{clearTimeout(timer)}}
-function showResults(arr,raw,q){$('preview').innerHTML=`<div style="width:100%"><b>Znaleziono dla: ${esc(q)}</b><div class="results">${arr.slice(0,8).map((a,i)=>`<div class="result"><img src="${esc(a.image)}"><div><b>${esc(a.title)}</b><div class="small">${esc(a.native)} ${a.year?' • '+a.year:''} ${a.episodes?' • '+a.episodes+' odc.':''}</div><div class="small">${esc((a.genres||[]).slice(0,5).join(', '))}</div></div><button type="button" onclick="chooseLookup(${i})">Wybierz</button></div>`).join('')}</div></div>`;$('preview').classList.remove('hidden');window._lookupResults=arr;window._lookupRaw=raw}
+function showResults(arr,raw,q){$('preview').innerHTML=`<div style="width:100%"><b>Znaleziono dla: ${esc(q)}</b><div class="results">${arr.slice(0,8).map((a,i)=>`<div class="result"><img src="${esc(a.image)}" alt=""><div style="min-width:0"><b>${esc(a.title)}</b><div class="small">${esc(a.native)} ${a.year?' • '+a.year:''} ${a.episodes?' • '+a.episodes+' odc.':''}</div><div class="small">${esc((a.genres||[]).slice(0,5).join(', '))}</div></div><button type="button" onclick="chooseLookup(${i})">Wybierz</button></div>`).join('')}</div></div>`;$('preview').classList.remove('hidden');window._lookupResults=arr;window._lookupRaw=raw}
 function chooseLookup(i){let a=(window._lookupResults||[])[i];if(a)fillResult(a,window._lookupRaw||'')}
-async function lookup(){let raw=$('lookup').value.trim();if(!raw)return alert('Wklej link albo wpisz nazwę anime.');$('lookupBtn').disabled=true;$('lookupBtn').textContent='⏳ Szukam...';$('preview').classList.add('hidden');let q=queryFrom(raw),results=[],errors=[];try{try{results=await jikanSearch(q)}catch(e){errors.push('Jikan: '+e.message)}if(!results.length){try{results=await aniListSearch(q)}catch(e){errors.push('AniList: '+e.message)}}if(!results.length&&/\bitem no chikara\b/i.test(q)){for(let alt of ['Overgeared','Temppal','템빨']){try{results=await aniListSearch(alt);if(results.length){q=alt;break}}catch(e){errors.push('AniList: '+e.message)}}}if(!results.length)throw new Error(errors.join('\n')||'Brak wyników');showResults(results,raw,q);if(results.length===1)fillResult(results[0],raw)}catch(e){alert('Nie udało się pobrać danych online.\n\n'+e.message+'\n\nSprawdź połączenie z internetem lub wpisz sam tytuł zamiast linku.')}finally{$('lookupBtn').disabled=false;$('lookupBtn').textContent='🔎 Pobierz dane'}}
+async function lookup(){let raw=$('lookup').value.trim();if(!raw)return alert('Wklej link albo wpisz nazwę anime.');$('lookupBtn').disabled=true;$('lookupBtn').textContent='Szukam…';$('preview').classList.add('hidden');let q=queryFrom(raw),results=[],errors=[];try{try{results=await jikanSearch(q)}catch(e){errors.push('Jikan: '+e.message)}if(!results.length){try{results=await aniListSearch(q)}catch(e){errors.push('AniList: '+e.message)}}if(!results.length&&/\bitem no chikara\b/i.test(q)){for(let alt of ['Overgeared','Temppal','템빨']){try{results=await aniListSearch(alt);if(results.length){q=alt;break}}catch(e){errors.push('AniList: '+e.message)}}}if(!results.length)throw new Error(errors.join('\n')||'Brak wyników');showResults(results,raw,q);if(results.length===1)fillResult(results[0],raw)}catch(e){alert('Nie udało się pobrać danych online.\n\n'+e.message+'\n\nSprawdź połączenie z internetem lub wpisz sam tytuł zamiast linku.')}finally{$('lookupBtn').disabled=false;$('lookupBtn').textContent='Pobierz dane'}}
 function saveForm(){let title=$('title').value.trim();if(!title)return alert('Podaj tytuł.');let obj={id:editing||Date.now(),title,series:$('series').value.trim(),season:$('season').value.trim(),totalEpisodes:Number($('episodes').value||0),currentEpisode:Number($('current').value||0),rating:Number($('rating').value||0),status:$('status').value,year:$('year').value,url:$('url').value.trim(),image:$('image').value.trim(),genres:$('genres').value.split(',').map(x=>x.trim()).filter(Boolean),description:$('description').value.trim(),notes:$('notes').value.trim(),addedDate:new Date().toISOString(),updatedDate:new Date().toISOString()};if(editing){let i=data.findIndex(x=>x.id===editing);obj.addedDate=data[i].addedDate;data[i]=obj}else data.push(obj);save();close()}
 async function exportBackup(){await saveQ;try{let r=await fetch('/api/backup');let js=await r.json();if(!r.ok)throw new Error(js.error);alert('Kopia zapisana:\n'+js.file)}catch(e){alert('Nie udało się zrobić kopii: '+e.message)}}
 async function importBackup(file){try{let js=JSON.parse(await file.text()),arr=Array.isArray(js)?js:js.animes;if(!Array.isArray(arr))throw 0;if(!confirm(`Backup zawiera ${arr.length} pozycji. Zastąpić obecną bibliotekę?`))return;data=norm(arr);save();alert('Backup przywrócony.')}catch{alert('Nieprawidłowy plik backupu.')}}
-$('addOpen').onclick=()=>openForm();$('close').onclick=$('cancel').onclick=close;$('lookupBtn').onclick=lookup;$('save').onclick=saveForm;$('exportBtn').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};$('autoBackupBtn').onclick=()=>fetch('/api/open-folder');['search','filterStatus','filterGenre','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',draw));
+$('addOpen').onclick=()=>openForm();$('close').onclick=$('cancel').onclick=close;$('lookupBtn').onclick=lookup;$('save').onclick=saveForm;$('exportBtn').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};$('autoBackupBtn').onclick=()=>fetch('/api/open-folder');
+$('lookup').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+['search','filterStatus','filterGenre','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',draw));
 migrate();
 </script></body></html>
