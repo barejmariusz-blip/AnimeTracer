@@ -6,7 +6,7 @@ Program na Windows do śledzenia oglądanych anime (sezony, odcinki, oceny, link
 Najnowszy `AnimeTracker.exe` jest w zakładce **Releases** (budowany automatycznie przy każdej zmianie w `main`).
 
 ## Dane
-- Zapis automatyczny: `Dokumenty\AnimeTracker\biblioteka.json`
+- Zapis automatyczny: domyślnie `Dokumenty\AnimeTracker\biblioteka.json` (zmiana: przycisk „Miejsce zapisu”)
 - Kopie dzienne (ostatnie 60): `Dokumenty\AnimeTracker\kopie\`
 - Wymaga Microsoft Edge WebView2 (wbudowany w Windows 10/11).
 

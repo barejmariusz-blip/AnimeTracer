@@ -139,7 +139,7 @@ func serve(ln net.Listener) {
 				jsonOut(w, map[string]string{"error": err.Error()})
 				return
 			}
-			jsonOut(w, map[string]any{"animes": a, "file": dataFile, "backupDir": backupDir})
+			jsonOut(w, map[string]any{"animes": a, "file": dataFile, "dir": dataDir, "defaultDir": defaultDataDir(), "isDefault": filepath.Clean(dataDir) == filepath.Clean(defaultDataDir())})
 		case http.MethodPost:
 			body, err := io.ReadAll(io.LimitReader(r.Body, 50<<20))
 			var arr []json.RawMessage
@@ -176,6 +176,52 @@ func serve(ln net.Listener) {
 		w.WriteHeader(500)
 		jsonOut(w, map[string]string{"error": err.Error()})
 	})
+	mux.HandleFunc("/api/pick-folder", func(w http.ResponseWriter, r *http.Request) {
+		p := pickFolder("Wybierz folder, w którym Anime Tracker ma zapisywać bibliotekę i kopie")
+		if p == "" {
+			jsonOut(w, map[string]any{"cancelled": true})
+			return
+		}
+		_, err := os.Stat(filepath.Join(p, "biblioteka.json"))
+		jsonOut(w, map[string]any{"path": p, "hasLibrary": err == nil, "same": filepath.Clean(p) == filepath.Clean(dataDir)})
+	})
+	// mode: "copy" = przenieś obecną bibliotekę do nowego folderu, "use" = wczytaj bibliotekę, która już tam jest
+	mux.HandleFunc("/api/set-folder", func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		var req struct{ Path, Mode string }
+		json.NewDecoder(r.Body).Decode(&req)
+		if req.Path == "default" {
+			req.Path = defaultDataDir()
+		}
+		fail := func(err error) {
+			w.WriteHeader(500)
+			jsonOut(w, map[string]string{"error": err.Error()})
+		}
+		if req.Path == "" {
+			fail(fmt.Errorf("nie podano folderu"))
+			return
+		}
+		if req.Mode != "use" {
+			if err := copyDataTo(req.Path); err != nil {
+				fail(err)
+				return
+			}
+		}
+		if err := setDataDir(req.Path); err != nil {
+			fail(err)
+			return
+		}
+		cfg := config{DataDir: req.Path}
+		if filepath.Clean(req.Path) == filepath.Clean(defaultDataDir()) {
+			cfg.DataDir = ""
+		}
+		if err := saveConfig(cfg); err != nil {
+			fail(err)
+			return
+		}
+		jsonOut(w, map[string]any{"ok": true, "dir": dataDir})
+	})
 	mux.HandleFunc("/api/open-folder", func(w http.ResponseWriter, r *http.Request) {
 		exec.Command("explorer", dataDir).Start()
 		jsonOut(w, map[string]bool{"ok": true})
@@ -191,12 +237,17 @@ func serve(ln net.Listener) {
 }
 
 func main() {
-	dataDir = filepath.Join(documentsDir(), "AnimeTracker")
-	dataFile = filepath.Join(dataDir, "biblioteka.json")
-	backupDir = filepath.Join(dataDir, "kopie")
-	if err := os.MkdirAll(backupDir, 0755); err != nil {
-		msgBox("Nie mogę utworzyć folderu danych:\n" + dataDir + "\n\n" + err.Error())
-		return
+	dir := loadConfig().DataDir
+	if dir == "" {
+		dir = defaultDataDir()
+	}
+	if err := setDataDir(dir); err != nil {
+		msgBox("Nie mogę użyć folderu danych:\n" + dir + "\n\n" + err.Error() + "\n\nWracam do domyślnego folderu w Dokumentach.")
+		if err := setDataDir(defaultDataDir()); err != nil {
+			msgBox("Nie mogę utworzyć folderu danych:\n" + defaultDataDir() + "\n\n" + err.Error())
+			return
+		}
+		saveConfig(config{})
 	}
 	// sanity check of seed
 	if !bytes.Contains(seedJSON, []byte("animes")) {
@@ -235,6 +286,7 @@ func main() {
 		return
 	}
 	defer w.Destroy()
+	mainHwnd = uintptr(w.Window())
 	w.Navigate(fmt.Sprintf("http://%s/", ln.Addr().String()))
 	w.Run()
 }

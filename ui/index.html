@@ -124,6 +124,7 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
 .formbtns button{flex:1}
 
 .foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:6px;font-size:12px;color:var(--dim);text-align:center}.foot .made{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.foot .made b{color:var(--sakura)}
+.pathbox{font:500 13px var(--mono);background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;word-break:break-all;color:var(--mint)}.choice{background:var(--ink3);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:12px}.choice p{margin:0;font-size:14px}
 @media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.stat:nth-child(4){border-left:0;padding-left:0}.filters,.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}}
 @media(max-width:560px){.card{grid-template-columns:96px minmax(0,1fr);gap:14px}.cover{width:96px}.title{font-size:17px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -139,7 +140,7 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
     <div class="toolbtns">
       <button class="ghost" id="exportBtn" title="Zapisz kopię biblioteki do folderu kopie">Zrób kopię</button>
       <button class="ghost" id="importBtn" title="Wczytaj bibliotekę z pliku JSON">Przywróć z pliku</button>
-      <button class="ghost" id="autoBackupBtn" title="Otwórz folder z danymi">Folder z danymi</button>
+      <button class="ghost" id="autoBackupBtn" title="Gdzie zapisuje się biblioteka i kopie">Miejsce zapisu</button>
       <button class="primary big" id="addOpen">+ Dodaj anime</button>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
@@ -163,6 +164,15 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
   </footer>
 </div>
 
+<div id="folderModal" class="modal hidden"><div class="sheet" style="width:min(620px,100%)">
+  <div class="head"><h2>Miejsce zapisu</h2><button class="ghost" id="fClose" aria-label="Zamknij">✕</button></div>
+  <div style="display:grid;gap:16px;margin-top:18px">
+    <div><label>Obecny folder</label><div id="fPath" class="pathbox"></div><div class="small">Tu leży <b>biblioteka.json</b> i folder <b>kopie</b> z kopiami z ostatnich 60 dni. Możesz wybrać np. folder w OneDrive albo na innym dysku.</div></div>
+    <div class="formbtns"><button class="primary" id="fPick">Zmień folder…</button><button id="fOpen">Otwórz w Eksploratorze</button></div>
+    <div id="fChoice" class="choice hidden"></div>
+    <button class="ghost" id="fDefault" style="justify-self:start">Przywróć domyślny (Dokumenty\AnimeTracker)</button>
+  </div>
+</div></div>
 <div id="modal" class="modal hidden"><div class="sheet">
   <div class="head"><h2 id="formTitle">Dodaj anime</h2><button class="ghost" id="close" aria-label="Zamknij">✕</button></div>
   <div class="formgrid">
@@ -189,9 +199,9 @@ label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase
 let data=[]; let editing=null; let lookupData=null;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function bar(t,c=''){let b=$('savebar');b.textContent=t;b.title=t;b.className='savebar '+c}
-let saveQ=Promise.resolve(),dataFile='';
+let saveQ=Promise.resolve(),dataFile='',dataDir='',isDefaultDir=true;
 function norm(old){return old.map(a=>({id:a.id||Date.now()+Math.random(),title:a.title||'',series:a.series||'',season:a.season||'',totalEpisodes:Number(a.totalEpisodes??a.episodes??0),currentEpisode:Number(a.currentEpisode||0),url:a.url||'',image:a.image||'',rating:Number(a.rating||0),status:a.status||'watching',genres:Array.isArray(a.genres)?a.genres:[],year:a.year||'',description:a.description||a.synopsis||'',notes:a.notes||'',addedDate:a.addedDate||new Date().toISOString(),updatedDate:a.updatedDate||a.addedDate||new Date().toISOString()}))}
-async function migrate(){try{let r=await fetch('/api/data');let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));dataFile=js.file;data=norm(js.animes||[]);draw();bar(data.length+' anime • zapis: '+dataFile,'ok')}catch(e){bar('Nie udało się wczytać danych: '+e.message,'err');alert('Nie udało się wczytać biblioteki.\n\n'+e.message)}}
+async function migrate(){try{let r=await fetch('/api/data');let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));dataFile=js.file;dataDir=js.dir;isDefaultDir=js.isDefault;data=norm(js.animes||[]);draw();bar(data.length+' anime • zapis: '+dataFile,'ok')}catch(e){bar('Nie udało się wczytać danych: '+e.message,'err');alert('Nie udało się wczytać biblioteki.\n\n'+e.message)}}
 function save(render=true){if(render)draw();let snap=JSON.stringify(data);bar('Zapisuję…');saveQ=saveQ.then(async()=>{try{let r=await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:snap});let js=await r.json();if(!r.ok)throw new Error(js.error||('HTTP '+r.status));bar('Zapisano '+js.savedAt+' • '+js.count+' anime • '+dataFile,'ok')}catch(e){bar('BŁĄD ZAPISU: '+e.message,'err');alert('Nie udało się zapisać!\n\n'+e.message)}})}
 const LABELS={watching:'Oglądam',completed:'Ukończone',plan:'Planuję',waiting:'Czekam',dropped:'Porzucone'};
 function label(s){return LABELS[s]||s}
@@ -243,10 +253,21 @@ async function lookup(){let raw=$('lookup').value.trim();if(!raw)return alert('W
 function saveForm(){let title=$('title').value.trim();if(!title)return alert('Podaj tytuł.');let obj={id:editing||Date.now(),title,series:$('series').value.trim(),season:$('season').value.trim(),totalEpisodes:Number($('episodes').value||0),currentEpisode:Number($('current').value||0),rating:Number($('rating').value||0),status:$('status').value,year:$('year').value,url:$('url').value.trim(),image:$('image').value.trim(),genres:$('genres').value.split(',').map(x=>x.trim()).filter(Boolean),description:$('description').value.trim(),notes:$('notes').value.trim(),addedDate:new Date().toISOString(),updatedDate:new Date().toISOString()};if(editing){let i=data.findIndex(x=>x.id===editing);obj.addedDate=data[i].addedDate;data[i]=obj}else data.push(obj);save();close()}
 async function exportBackup(){await saveQ;try{let r=await fetch('/api/backup');let js=await r.json();if(!r.ok)throw new Error(js.error);alert('Kopia zapisana:\n'+js.file)}catch(e){alert('Nie udało się zrobić kopii: '+e.message)}}
 async function importBackup(file){try{let js=JSON.parse(await file.text()),arr=Array.isArray(js)?js:js.animes;if(!Array.isArray(arr))throw 0;if(!confirm(`Backup zawiera ${arr.length} pozycji. Zastąpić obecną bibliotekę?`))return;data=norm(arr);save();alert('Backup przywrócony.')}catch{alert('Nieprawidłowy plik backupu.')}}
-$('addOpen').onclick=()=>openForm();$('close').onclick=$('cancel').onclick=close;$('lookupBtn').onclick=lookup;$('save').onclick=saveForm;$('exportBtn').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};$('autoBackupBtn').onclick=()=>fetch('/api/open-folder');
+$('addOpen').onclick=()=>openForm();$('close').onclick=$('cancel').onclick=close;$('lookupBtn').onclick=lookup;$('save').onclick=saveForm;$('exportBtn').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};$('autoBackupBtn').onclick=openFolderModal;
 $('lookup').addEventListener('keydown',e=>{if(e.key==='Enter')lookup()});
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))close()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){close();closeFolder()}});
+function openFolderModal(){$('fPath').textContent=dataDir||'—';$('fChoice').classList.add('hidden');$('fDefault').classList.toggle('hidden',isDefaultDir);$('folderModal').classList.remove('hidden')}
+function closeFolder(){$('folderModal').classList.add('hidden')}
+async function applyFolder(path,mode){await saveQ;try{let r=await fetch('/api/set-folder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path,mode})});let js=await r.json();if(!r.ok)throw new Error(js.error);await migrate();openFolderModal();bar('Nowe miejsce zapisu: '+dataDir,'ok')}catch(e){alert('Nie udało się zmienić folderu:\n\n'+e.message)}}
+async function pickFolder(){let b=$('fPick');b.disabled=true;b.textContent='Wybierz folder w oknie…';try{let r=await fetch('/api/pick-folder',{method:'POST'});let js=await r.json();if(js.cancelled)return;if(js.same){alert('To już jest obecny folder zapisu.');return}
+ let c=$('fChoice');window._newDir=js.path;
+ c.innerHTML=js.hasLibrary?`<p>W folderze <b>${esc(js.path)}</b> jest już biblioteka Anime Trackera. Co zrobić?</p><div class="formbtns"><button class="primary" onclick="applyFolder(window._newDir,'use')">Wczytaj tamtą bibliotekę</button><button onclick="if(confirm('Nadpisać bibliotekę w nowym folderze obecną (${data.length} anime)?'))applyFolder(window._newDir,'copy')">Nadpisz obecną</button></div>`
+ :`<p>Przeniosę bibliotekę (${data.length} anime) i kopie do:<br><b>${esc(js.path)}</b></p><p class="small" style="margin:0">Pliki w starym folderze zostaną nietknięte.</p><div class="formbtns"><button class="primary" onclick="applyFolder(window._newDir,'copy')">Przenieś i zapisuj tutaj</button><button onclick="$('fChoice').classList.add('hidden')">Anuluj</button></div>`;
+ c.classList.remove('hidden')}catch(e){alert('Nie udało się otworzyć okna wyboru: '+e.message)}finally{b.disabled=false;b.textContent='Zmień folder…'}}
+$('fClose').onclick=closeFolder;$('fOpen').onclick=()=>fetch('/api/open-folder');$('fPick').onclick=pickFolder;
+$('fDefault').onclick=()=>{if(confirm('Wrócić do domyślnego folderu w Dokumentach? Obecna biblioteka zostanie tam skopiowana.'))applyFolder('default','copy')};
+$('folderModal').addEventListener('click',e=>{if(e.target===$('folderModal'))closeFolder()});
 ['search','filterStatus','filterGenre','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',draw));
 $('year').textContent=new Date().getFullYear();
 migrate();
