@@ -1,0 +1,72 @@
+{
+  "app": "Anime Tracker 2.0",
+  "version": 2,
+  "exportedAt": "2026-10-20T06:15:12.660Z",
+  "animes": [
+    {
+      "id": 1791011178193,
+      "title": "Overgeared",
+      "series": "",
+      "season": "",
+      "totalEpisodes": 12,
+      "currentEpisode": 4,
+      "rating": 0,
+      "status": "watching",
+      "year": "2026",
+      "url": "https://shinden.pl/series/73355-tempal-item-no-chikara/episodes",
+      "image": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx212888-NhyvqPt5aIuJ.jpg",
+      "genres": [
+        "Action",
+        "Adventure",
+        "Comedy",
+        "Fantasy"
+      ],
+      "description": "Sin Yeong-U (a.k.a. Grid), an unlucky man in life and a low-level player in the popular VR game “Satisfy,” finds a powerful item that earns him a rare legendary class title: “Pagma’s Successor.” He’s now a skilled blacksmith who can forge unique weapons and equip the game’s most powerful gear. Grid resolves to use his new abilities to achieve fame and fortune, but as his very existence begins to stir up trouble in Satisfy, he realizes that life as a legend may be more than he bargained for….\n\n(Source: Tapas, edited)\n\nNote: Tempal: Item no Chikara is streaming a week in advance of the TV broadcast on Prime Video and Crunchyroll beginning September 27th, 2026. Regular broadcasting began on October 2nd, 2026.",
+      "notes": "",
+      "addedDate": "2026-10-03T07:06:18.193Z",
+      "updatedDate": "2026-10-20T06:04:59.440Z"
+    },
+    {
+      "id": 1791011318963,
+      "title": "Kaiju No. 8",
+      "series": "",
+      "season": "",
+      "totalEpisodes": 12,
+      "currentEpisode": 5,
+      "rating": 0,
+      "status": "watching",
+      "year": "2024",
+      "url": "https://shinden.pl/series/60484-kaijuu-8-gou/episodes",
+      "image": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx153288-25FBfFJzEQ5O.jpg",
+      "genres": [
+        "Action",
+        "Sci-Fi"
+      ],
+      "description": "With the highest kaiju-emergence rates in the world, Japan is no stranger to attack by deadly monsters. Enter the Japan Defense Force, a military organization tasked with the neutralization of kaiju. Kafka Hibino, a kaiju-corpse cleanup man, has always dreamed of joining the force. But when he gets another shot at achieving his childhood dream, he undergoes an unexpected transformation. How can he fight kaiju now that he’s become one himself?!\n\n(Source: VIZ Media)",
+      "notes": "",
+      "addedDate": "2026-10-03T07:08:38.963Z",
+      "updatedDate": "2026-10-20T06:04:56.271Z"
+    },
+    {
+      "id": 1791015984320,
+      "title": "The Exiled Heavy Knight Knows How to Game the System",
+      "series": "",
+      "season": "",
+      "totalEpisodes": 26,
+      "currentEpisode": 12,
+      "rating": 0,
+      "status": "watching",
+      "year": "2026",
+      "url": "https://shinden.pl/series/68359-tsuihou-sareta-tensei-juukishi-wa-game-chishiki-de-musou-suru/episodes",
+      "image": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx180136-gtMTCRlOD4OE.jpg",
+      "genres": [
+        "Action",
+        "Fantasy"
+      ],
+      "description": "Born into a prestigious family of master swordsmen, Elymas Edvaughn’s future shatters when he awakens the so-called “defective” Heavy Knight class. Disowned and cast out, he regains memories of another life—and realizes this world mirrors a VR game he once mastered. Armed with knowledge no one else possesses, he sets out to rewrite his fate and prove the strength of the “weakest” class.\n\n(Source: Crunchyroll)",
+      "notes": "",
+      "addedDate": "2026-10-03T08:26:24.320Z",
+      "updatedDate": "2026-10-20T06:04:54.595Z"
+    }
+  ]
+}
