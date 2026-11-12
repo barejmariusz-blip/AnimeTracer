@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'pl.panrodla.animetracker'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'pl.panrodla.animetracker'
+        minSdk 24
+        targetSdk 34
+        versionCode (System.getenv('BUILD_NUMBER') ?: '1') as int
+        versionName "2.0." + (System.getenv('BUILD_NUMBER') ?: '1')
+    }
+
+    // Stały klucz — dzięki niemu każda nowa wersja instaluje się jako aktualizacja (bez utraty danych).
+    signingConfigs {
+        release {
+            storeFile rootProject.file('animetracker.jks')
+            storePassword 'panrodla'
+            keyAlias 'animetracker'
+            keyPassword 'panrodla'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // Wspólny interfejs z wersją na Windows: ui/index.html i seed.json z katalogu głównego repo.
+    sourceSets {
+        main {
+            assets.srcDirs += ['build/sharedAssets']
+        }
+    }
+}
+
+tasks.register('copySharedAssets', Copy) {
+    from(rootProject.file('../ui/index.html'))
+    from(rootProject.file('../seed.json'))
+    into layout.buildDirectory.dir('sharedAssets')
+}
+preBuild.dependsOn 'copySharedAssets'
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+}
