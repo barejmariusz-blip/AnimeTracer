@@ -10,7 +10,7 @@ android {
         applicationId 'pl.panrodla.animetracker'
         minSdk 24
         targetSdk 34
-        versionCode (System.getenv('BUILD_NUMBER') ?: '1') as int
+        versionCode((System.getenv('BUILD_NUMBER') ?: '1').toInteger())
         versionName "2.0." + (System.getenv('BUILD_NUMBER') ?: '1')
     }
 

@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
@@ -29,7 +30,7 @@ jobs:
         working-directory: android
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-        run: gradle --no-daemon assembleRelease
+        run: gradle --no-daemon --stacktrace assembleRelease 2>&1 | tee ../build-log.txt; exit ${PIPESTATUS[0]}
       - name: Rename
         run: cp android/app/build/outputs/apk/release/app-release.apk AnimeTracker.apk
       - uses: actions/upload-artifact@v4
@@ -42,3 +43,11 @@ jobs:
           tag_name: apk-v${{ github.run_number }}
           name: Anime Tracker Android v${{ github.run_number }}
           files: AnimeTracker.apk
+      - name: Publish build log on failure
+        if: failure()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-log-${{ github.run_number }}
+          name: APK build log ${{ github.run_number }}
+          prerelease: true
+          files: build-log.txt
